@@ -192,8 +192,10 @@ glance-manage db_sync
 
 #Install and configure Horizon
 #http://openstack-folsom-install-guide.readthedocs.org/en/latest/
+figlet Installing Horizon -t
 apt-get install openstack-dashboard memcached -y
 
+figlet Now Test Your Install -t
 echo "
 http://$1
 username: admin
