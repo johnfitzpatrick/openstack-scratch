@@ -1,6 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash
 
-#This scripts is based on the steps here https://wookiee.rightscale.com/display/rightscale/OpenStack+Install
+#This scripts is based on the steps here https://<<Internal Website Removed>>/display/rightscale/OpenStack+Install
 #John Fitzpatrick June 2013
 
 #++++++++++++++++++++++++++++
@@ -192,8 +192,10 @@ glance-manage db_sync
 
 #Install and configure Horizon
 #http://openstack-folsom-install-guide.readthedocs.org/en/latest/
+figlet Installing Horizon -t
 apt-get install openstack-dashboard memcached -y
 
+figlet Now Test Your Install -t
 echo "
 http://$1
 username: admin
