@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-#This scripts is based on the steps here https://wookiee.rightscale.com/display/rightscale/OpenStack+Install
+#This scripts is based on the steps here https://<<Internal Website Removed>>/display/rightscale/OpenStack+Install
 #John Fitzpatrick June 2013
 
 #++++++++++++++++++++++++++++
