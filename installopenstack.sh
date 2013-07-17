@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash
 
 #This scripts is based on the steps here https://<<Internal Website Removed>>/display/rightscale/OpenStack+Install
 #John Fitzpatrick June 2013
