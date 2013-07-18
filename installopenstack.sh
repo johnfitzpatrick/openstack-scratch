@@ -27,16 +27,14 @@ NOVA_PRIV_IP=localhost
 CINDER_PRIV_IP=localhost
 GLANCE_PRIV_IP=localhost
 
-#Passwords
+#PASSWORDS
 #You're prompted for the MySQL Password during install.  The value in this script must be the same.
-MYSQLPWORD=$2 
 TOKEN=012345SECRET99TOKEN012345
-#KEYSTONE_HOST=192.168.2.1
 GLANCEPASSWORD=glance
-
+MYSQLPWORD=$2 
 
 #++++++++++++++++++++++++++++
-#Using figlet banner some installation feedback
+#Using figlet to banner some installation feedback
 apt-get install figlet -y
 figlet Installing OpenStack -t
 # Could use 'toilet'
