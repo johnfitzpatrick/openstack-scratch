@@ -184,7 +184,7 @@ glance-manage db_sync
 #mkdir /root/images
 #cd /root/images
 #wget https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
-#<--THIS FAILS-->
+#<--THIS BIT BELOW FAILS-->
 #glance image-create --name NimbulaTest --is-public true --container-format bare --disk-format qcow2 < cirros-0.3.0-x86_64-disk.img
 #glance add name="NimbulaTest" is-public=true container-format=bare disk-format=qcow2 < cirros-0.3.0-x86_64-disk.img
 
