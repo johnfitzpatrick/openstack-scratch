@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #This scripts is based on the steps here https://<<Internal Website Removed>>/display/rightscale/OpenStack+Install
-#John Fitzpatrick June 2013
+#John Fitzpatrick July 2013
 
 #++++++++++++++++++++++++++++
 #Use the following if installing on a single node, to ensure the IP Address is populated in script
