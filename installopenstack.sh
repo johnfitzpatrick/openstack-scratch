@@ -178,6 +178,7 @@ for i in glance-*; do service $i restart; done
 glance-manage version_control 0
 glance-manage db_sync
 
+#TRYING UP UPLOAD AN IMAGE HERE, BUT CAN'T GET THIS TO WORK SO REM'd OUT FOR NOW
 ##Assumming root here
 ##From http://openstack-folsom-install-guide.readthedocs.org/en/latest/
 #mkdir /root/images
@@ -185,14 +186,12 @@ glance-manage db_sync
 #wget https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
 #<--THIS FAILS-->
 #glance image-create --name NimbulaTest --is-public true --container-format bare --disk-format qcow2 < cirros-0.3.0-x86_64-disk.img
-
 #glance add name="NimbulaTest" is-public=true container-format=bare disk-format=qcow2 < cirros-0.3.0-x86_64-disk.img
 
 #Install and configure Horizon
 #http://openstack-folsom-install-guide.readthedocs.org/en/latest/
 figlet Installing Horizon -t
 apt-get install openstack-dashboard memcached -y
-
 
 figlet Now Test Your Install -t
 echo "
