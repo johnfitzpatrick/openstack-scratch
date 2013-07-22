@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #This scripts is based on the steps here https://<<Internal Website Removed>>/display/rightscale/OpenStack+Install
+#Assumes a single node install.  Created/tested on server running in AWS
+#You must pass the Public IP & MySQL Password as params to the script
+#
 #John Fitzpatrick July 2013
 
-#++++++++++++++++++++++++++++
-#Use the following if installing on a single node, to ensure the IP Address is populated in script
-#Comment it out otherwise
 EXPECTED_ARGS=2
 E_BADARGS=65
 
