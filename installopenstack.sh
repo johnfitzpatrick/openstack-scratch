@@ -188,6 +188,82 @@ glance-manage db_sync
 #glance image-create --name NimbulaTest --is-public true --container-format bare --disk-format qcow2 < cirros-0.3.0-x86_64-disk.img
 #glance add name="NimbulaTest" is-public=true container-format=bare disk-format=qcow2 < cirros-0.3.0-x86_64-disk.img
 
+#Install and configure Nova
+#http://openstack-folsom-install-guide.readthedocs.org/en/latest/
+figlet Installing Nova -t
+apt-get install -y nova-api nova-cert novnc nova-consoleauth nova-scheduler  nova-network
+
+mysql -uroot -p$MYSQLPWORD -s -N -e "CREATE DATABASE nova"
+mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON nova.* TO 'novaUser'@'%' IDENTIFIED BY 'novaPass'"
+
+
+cat >> /etc/nova/api-paste.ini << EOF
+signing_dirname = /tmp/keystone-signing-nova
+EOF
+
+
+cat >> /etc/nova/nova.conf << EOF
+[DEFAULT]
+logdir=/var/log/nova
+state_path=/var/lib/nova
+lock_path=/run/lock/nova
+verbose=True
+api_paste_config=/etc/nova/api-paste.ini
+scheduler_driver=nova.scheduler.simple.SimpleScheduler
+s3_host=localhost
+ec2_host=localhost
+ec2_dmz_host=localhost
+rabbit_host=localhost
+cc_host=localhost
+metadata_host=localhost
+metadata_listen=0.0.0.0
+nova_url=http://localhost:8774/v1.1/
+sql_connection=mysql://novaUser:novaPass@localhost/nova
+ec2_url=http://localhost:8773/services/Cloud
+root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
+
+# Auth
+use_deprecated_auth=false
+auth_strategy=keystone
+keystone_ec2_url=http://localhost:5000/v2.0/ec2tokens
+# Imaging service
+glance_api_servers=localhost:9292
+image_service=nova.image.glance.GlanceImageService
+
+# Vnc configuration
+novnc_enabled=true
+novncproxy_base_url=http://localhost:6080/vnc_auto.html
+novncproxy_port=6080
+vncserver_proxyclient_address=localhost
+vncserver_listen=0.0.0.0
+
+# NETWORK
+network_manager=nova.network.manager.FlatDHCPManager
+force_dhcp_release=True
+dhcpbridge_flagfile=/etc/nova/nova.conf
+firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+# Change my_ip to match each host
+my_ip=localhost
+public_interface=br100
+vlan_interface=eth0
+flat_network_bridge=br100
+flat_interface=eth0
+#Note the different pool, this will be used for instance range
+fixed_range=10.33.14.0/24
+
+# Compute #
+compute_driver=libvirt.LibvirtDriver
+
+# Cinder #
+volume_api_class=nova.volume.cinder.API
+osapi_volume_listen_port=5900
+
+EOF
+
+nova-manage db sync
+cd /etc/init.d/; for i in $(ls nova-*); do sudo service $i restart; done
+nova-manage service list
+
 #Install and configure Horizon
 #http://openstack-folsom-install-guide.readthedocs.org/en/latest/
 figlet Installing Horizon -t
@@ -198,4 +274,3 @@ echo "
 http://$1
 username: admin
 password: admin"
-
