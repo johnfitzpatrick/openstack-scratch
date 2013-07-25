@@ -9,7 +9,7 @@
 ################################################################
 #NOTES:                                                        #
 #Changed version numbers to v1 for all Cinder urls on line 131 #
-#                                                              #
+#Added /v1 to glance endpoint urls                             #
 ################################################################
 
 EXPECTED_ARGS=2
@@ -117,23 +117,19 @@ echo "Service and Endpoint Configuration"
 #Service and Endpoint Setup
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=keystone --type=identity --description="Keystone Identity Service";sleep 0.5
 SERVICE_ID_KEYSTONE_IDENTITY=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='identity'"`;sleep 0.5
-
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_KEYSTONE_IDENTITY --publicurl=http://$KEYSTONE_PUB_IP:5000/v2.0 --internalurl=http://$KEYSTONE_PRIV_IP:5000/v2.0 --adminurl=http://$KEYSTONE_PUB_IP:35357/v2.0
 
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=nova --type=compute --description="Nova Compute Service";sleep 0.5
 SERVICE_ID_NOVA_COMPUTE=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='compute'"`;sleep 0.5
-
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_NOVA_COMPUTE --publicurl=http://$NOVA_PUB_IP:8774/v2/%\(tenant_id\)s --internalurl=http://$NOVA_PRIV_IP:8774/v2/%\(tenant_id\)s --adminurl=http://$NOVA_PUB_IP:8774/v2/%\(tenant_id\)s
 
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=cinder --type=volume --description="Cinder Volume Service";sleep 0.5
 SERVICE_ID_CINDER_VOLUME=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='volume'"`;sleep 0.5
-
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_CINDER_VOLUME --publicurl=http://$CINDER_PUB_IP:8776/v1/%\(tenant_id\)s --internalurl=http://$CINDER_PRIV_IP:8776/v1/%\(tenant_id\)s --adminurl=http://$CINDER_PUB_IP:8776/v1/%\(tenant_id\)s
 
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=glance --type=image --description="Glance Image Service";sleep 0.5
 SERVICE_ID_GLANCE_IMAGE=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='image'"`;sleep 0.5
-
-keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_GLANCE_IMAGE --publicurl=http://$GLANCE_PUB_IP:9292 --internalurl=http://$GLANCE_PRIV_IP:9292 --adminurl=http://$GLANCE_PUB_IP:9292
+keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_GLANCE_IMAGE --publicurl=http://$GLANCE_PUB_IP:9292/v1 --internalurl=http://$GLANCE_PRIV_IP:9292/v1 --adminurl=http://$GLANCE_PUB_IP:9292/v1
 
 sudo apt-get install python-paste glance glance-client python-mysqldb -y
 
