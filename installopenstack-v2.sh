@@ -137,7 +137,8 @@ figlet Glance Config -t
 #MySQL Config - Glance
 mysql -uroot -p$MYSQLPWORD -s -N -e "CREATE DATABASE glance"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'%' IDENTIFIED BY '$GLANCEPASSWORD'"
-mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'$GLANCE_PRIV_IP' IDENTIFIED BY '$GLANCEPASSWORD'"
+#mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'$GLANCE_PRIV_IP' IDENTIFIED BY '$GLANCEPASSWORD'"
+mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '$GLANCEPASSWORD'"
 
 
 rm /var/lib/glance/glance.sqlite
