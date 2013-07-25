@@ -45,7 +45,8 @@ GLANCE_PRIV_IP=localhost
 #PASSWORDS
 #You're prompted for the MySQL Password during install.  The value in this script must be the same.
 TOKEN=012345SECRET99TOKEN012345
-GLANCEPASSWORD=glance
+#GLANCEPASSWORD=glance
+GLANCEPASSWORD=admin
 MYSQLPWORD=$2 
 
 ##Keystone Package Install
@@ -164,8 +165,10 @@ auth_host = 127.0.0.1
 auth_port = 35357
 auth_protocol = http
 admin_tenant_name = service
-admin_user = glance
-admin_password = glance
+#admin_user = glance
+#admin_password = glance
+admin_user = admin
+admin_password = admin
 
 [paste-deploy]
 flavor=keystone
@@ -194,8 +197,10 @@ auth_host = 127.0.0.1
 auth_port = 35357
 auth_protocol = http
 admin_tenant_name = service
-admin_user = glance
-admin_password = glance
+#admin_user = glance
+#admin_password = glance
+admin_user = admin
+admin_password = admin
 
 [paste_deploy]
 config_file = /etc/glance/glance-registry-paste.ini
@@ -262,8 +267,8 @@ use_deprecated_auth=false
 auth_strategy=keystone
 keystone_ec2_url=http://localhost:5000/v2.0/ec2tokens
 # Imaging service
-#glance_api_servers=localhost:9292
-glance_api_servers=localhost:9292/v1
+glance_api_servers=localhost:9292
+#glance_api_servers=localhost:9292/v1
 image_service=nova.image.glance.GlanceImageService
 
 # Vnc configuration
