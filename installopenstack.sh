@@ -6,15 +6,30 @@
 #
 #John Fitzpatrick July 2013
 
+################################################################
+#NOTES:                                                        #
+#Changed version numbers to v1 for all Cinder urls on line 131 #
+#Added /v1 to glance endpoint urls                              #
+################################################################
+
 EXPECTED_ARGS=2
 E_BADARGS=65
 
 if [ $# -ne $EXPECTED_ARGS ]
 then
   echo "Usage: installopenstack.sh <Public IP Address> <MySQL Password>"
-  echo "You're also prompted for the MySQL Password during install.  The value provided here must be the same."
+#  echo "You're also prompted for the MySQL Password during install.  The value provided here must be the same."
 exit $E_BADARGS
 fi
+
+#++++++++++++++++++++++++++++
+#Using figlet to banner some installation feedback
+apt-get install figlet -y
+figlet Installing OpenStack -t
+# Could use 'toilet'
+# apt-get install toilet -y
+#toilet -f mono12 -F metal Installing OpenStack
+#++++++++++++++++++++++++++++
 
 KEYSTONE_PUB_IP=$1
 NOVA_PUB_IP=$1
@@ -33,20 +48,16 @@ TOKEN=012345SECRET99TOKEN012345
 GLANCEPASSWORD=glance
 MYSQLPWORD=$2 
 
-#++++++++++++++++++++++++++++
-#Using figlet to banner some installation feedback
-apt-get install figlet -y
-figlet Installing OpenStack -t
-# Could use 'toilet'
-# apt-get install toilet -y
-#toilet -f mono12 -F metal Installing OpenStack
-#++++++++++++++++++++++++++++
-
 ##Keystone Package Install
 figlet Keystone Package -t
 echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/folsom main" >> /etc/apt/sources.list.d/folsom.list
 
 sudo apt-get install ubuntu-cloud-keyring -y
+apt-get install debconf-utils
+echo "mysql-server-5.5 mysql-server/root_password_again password $MYSQLPWORD" | debconf-set-selections
+echo "mysql-server-5.5 mysql-server/root_password password $MYSQLPWORD" | debconf-set-selections
+#apt-get install mysql-server -y
+#apt-get install python-mysqldb keystone -y
 apt-get install mysql-server python-mysqldb keystone -y
 
 #Not sure if I should do this, but bombs out otherwise
@@ -58,8 +69,8 @@ mysql -uroot -p$MYSQLPWORD -s -N -e "CREATE DATABASE keystone"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '$MYSQLPWORD'"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '$MYSQLPWORD'"
 
-#figlet Glance Package -t
-#sudo apt-get install glance -y
+figlet Glance Package -t
+sudo apt-get install glance -y
 
 sed -i -r "s/admin_token = ADMIN/admin_token = $TOKEN/i" /etc/keystone/keystone.conf
 sed -i -r "s/connection = sqlite:\/\/\/\/var\/lib\/keystone\/keystone.db/connection = mysql:\/\/keystone:$MYSQLPWORD@localhost\/keystone/i" /etc/keystone/keystone.conf
@@ -111,23 +122,19 @@ echo "Service and Endpoint Configuration"
 #Service and Endpoint Setup
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=keystone --type=identity --description="Keystone Identity Service";sleep 0.5
 SERVICE_ID_KEYSTONE_IDENTITY=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='identity'"`;sleep 0.5
-
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_KEYSTONE_IDENTITY --publicurl=http://$KEYSTONE_PUB_IP:5000/v2.0 --internalurl=http://$KEYSTONE_PRIV_IP:5000/v2.0 --adminurl=http://$KEYSTONE_PUB_IP:35357/v2.0
 
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=nova --type=compute --description="Nova Compute Service";sleep 0.5
 SERVICE_ID_NOVA_COMPUTE=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='compute'"`;sleep 0.5
-
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_NOVA_COMPUTE --publicurl=http://$NOVA_PUB_IP:8774/v2/%\(tenant_id\)s --internalurl=http://$NOVA_PRIV_IP:8774/v2/%\(tenant_id\)s --adminurl=http://$NOVA_PUB_IP:8774/v2/%\(tenant_id\)s
 
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=cinder --type=volume --description="Cinder Volume Service";sleep 0.5
 SERVICE_ID_CINDER_VOLUME=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='volume'"`;sleep 0.5
-
-keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_CINDER_VOLUME --publicurl=http://$CINDER_PUB_IP:8776/v1/%\(tenant_id\)s --internalurl=http://$CINDER_PRIV_IP:8776/v1/%\(tenant_id\)s --adminurl=http://$CINDER_PUB_IP:8776/v2/%\(tenant_id\)s
+keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_CINDER_VOLUME --publicurl=http://$CINDER_PUB_IP:8776/v1/%\(tenant_id\)s --internalurl=http://$CINDER_PRIV_IP:8776/v1/%\(tenant_id\)s --adminurl=http://$CINDER_PUB_IP:8776/v1/%\(tenant_id\)s
 
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=glance --type=image --description="Glance Image Service";sleep 0.5
 SERVICE_ID_GLANCE_IMAGE=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='image'"`;sleep 0.5
-
-keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_GLANCE_IMAGE --publicurl=http://$GLANCE_PUB_IP:9292 --internalurl=http://$GLANCE_PRIV_IP:9292 --adminurl=http://$GLANCE_PUB_IP:9292
+keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_GLANCE_IMAGE --publicurl=http://$GLANCE_PUB_IP:9292/v1 --internalurl=http://$GLANCE_PRIV_IP:9292/v1 --adminurl=http://$GLANCE_PUB_IP:9292/v1
 
 sudo apt-get install python-paste glance glance-client python-mysqldb -y
 
@@ -135,7 +142,8 @@ figlet Glance Config -t
 #MySQL Config - Glance
 mysql -uroot -p$MYSQLPWORD -s -N -e "CREATE DATABASE glance"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'%' IDENTIFIED BY '$GLANCEPASSWORD'"
-mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'$GLANCE_PRIV_IP' IDENTIFIED BY '$GLANCEPASSWORD'"
+#mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'$GLANCE_PRIV_IP' IDENTIFIED BY '$GLANCEPASSWORD'"
+mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '$GLANCEPASSWORD'"
 
 
 rm /var/lib/glance/glance.sqlite
@@ -150,9 +158,25 @@ sed -i -r "s/admin_password = %SERVICE_PASSWORD%/admin_password = $GLANCEPASSWOR
 #Configure /etc/glance/glance-api.conf
 cat >> /etc/glance/glance-api.conf << EOF
 sql_connection = mysql://glance:$GLANCEPASSWORD@$GLANCE_PRIV_IP/glance
+
+[keystone_authtoken]
+auth_host = 127.0.0.1
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = glance
+admin_password = glance
+
 [paste-deploy]
 flavor=keystone
+config_file = /etc/glance/glance-api-paste.ini
+
+#Think this should be v1
+enable_v1_api=True
+enable_v2_api=False
 EOF
+
+service glance-api restart
 
 #Configure /etc/glance/glance-registry-paste.ini
 sed -i -r "s/auth_host = 127.0.0.1/auth_host = $KEYSTONE_PRIV_IP/i" /etc/glance/glance-registry-paste.ini
@@ -161,32 +185,43 @@ sed -i -r "s/admin_tenant_name = %SERVICE_TENANT_NAME%/admin_tenant_name = servi
 sed -i -r "s/admin_user = %SERVICE_USER%/admin_user = glance/i" /etc/glance/glance-registry-paste.ini
 sed -i -r "s/admin_password = %SERVICE_PASSWORD%/admin_password = $GLANCEPASSWORD/i" /etc/glance/glance-registry-paste.ini
 
-
-
 #Configure /etc/glance/glance-registry.conf
 sed -i -r "s/sql_connection = sqlite:\/\/\/\/var\/lib\/glance\/glance.sqlite/sql_connection = mysql:\/\/glance:$GLANCEPASSWORD@$GLANCE_PRIV_IP\/glance/i" /etc/glance/glance-registry.conf
 
 cat >> /etc/glance/glance-registry.conf << EOF
-[paste-deploy]
+[keystone_authtoken]
+auth_host = 127.0.0.1
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = service
+admin_user = glance
+admin_password = glance
+
+[paste_deploy]
+config_file = /etc/glance/glance-registry-paste.ini
 flavor=keystone
 EOF
+
+service glance-registry restart
+glance-manage db_sync
 
 #Start glance
 figlet Starting Glance -t
 cd /etc/init.d
 for i in glance-*; do service $i restart; done
 glance-manage version_control 0
-glance-manage db_sync
+#glance-manage db_sync
 
 #TRYING UP UPLOAD AN IMAGE HERE, BUT CAN'T GET THIS TO WORK SO REM'd OUT FOR NOW
 ##Assumming root here
 ##From http://openstack-folsom-install-guide.readthedocs.org/en/latest/
-#mkdir /root/images
-#cd /root/images
-#wget https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img
-#<--THIS BIT BELOW FAILS-->
-#glance image-create --name NimbulaTest --is-public true --container-format bare --disk-format qcow2 < cirros-0.3.0-x86_64-disk.img
-#glance add name="NimbulaTest" is-public=true container-format=bare disk-format=qcow2 < cirros-0.3.0-x86_64-disk.img
+mkdir /root/images
+cd /root/images
+wget http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-disk.img
+#<--THESE COMMANDS BELOW FAIL-->
+#glance image-create --name NimbulaTest --is-public true --container-format bare --disk-format qcow2 < cirros-0.3.1-x86_64-disk.img
+#glance add name="cirros Tester" is-public=true container-format=bare disk-format=qcow2 < cirros-0.3.1-x86_64-disk.img
+#glance add --os_auth_token="012345SECRET99TOKEN012345"  name="cirros Tester" is_public=true disk_format=qcow2 container_format=bare  --host=54.216.212.71 < cirros-0.3.1-x86_64-disk.img
 
 #Install and configure Nova
 #http://openstack-folsom-install-guide.readthedocs.org/en/latest/
@@ -227,7 +262,8 @@ use_deprecated_auth=false
 auth_strategy=keystone
 keystone_ec2_url=http://localhost:5000/v2.0/ec2tokens
 # Imaging service
-glance_api_servers=localhost:9292
+#glance_api_servers=localhost:9292
+glance_api_servers=localhost:9292/v1
 image_service=nova.image.glance.GlanceImageService
 
 # Vnc configuration
