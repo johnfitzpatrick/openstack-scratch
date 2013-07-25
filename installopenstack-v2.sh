@@ -18,7 +18,7 @@ E_BADARGS=65
 if [ $# -ne $EXPECTED_ARGS ]
 then
   echo "Usage: installopenstack.sh <Public IP Address> <MySQL Password>"
-  echo "You're also prompted for the MySQL Password during install.  The value provided here must be the same."
+#  echo "You're also prompted for the MySQL Password during install.  The value provided here must be the same."
 exit $E_BADARGS
 fi
 
@@ -53,6 +53,11 @@ figlet Keystone Package -t
 echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/folsom main" >> /etc/apt/sources.list.d/folsom.list
 
 sudo apt-get install ubuntu-cloud-keyring -y
+apt-get install debconf-utils
+echo "mysql-server-5.5 mysql-server/root_password_again password $MYSQLPWORD" | debconf-set-selections
+echo "mysql-server-5.5 mysql-server/root_password password $MYSQLPWORD" | debconf-set-selections
+#apt-get install mysql-server -y
+#apt-get install python-mysqldb keystone -y
 apt-get install mysql-server python-mysqldb keystone -y
 
 #Not sure if I should do this, but bombs out otherwise
@@ -257,7 +262,8 @@ use_deprecated_auth=false
 auth_strategy=keystone
 keystone_ec2_url=http://localhost:5000/v2.0/ec2tokens
 # Imaging service
-glance_api_servers=localhost:9292
+#glance_api_servers=localhost:9292
+glance_api_servers=localhost:9292/v1
 image_service=nova.image.glance.GlanceImageService
 
 # Vnc configuration
