@@ -9,7 +9,7 @@
 ################################################################
 #NOTES:                                                        #
 #Changed version numbers to v1 for all Cinder urls on line 131 #
-#Added /v1 to glance endpoint urls                             #
+#Added /v1 to glance endpoint urls                              #
 ################################################################
 
 EXPECTED_ARGS=2
@@ -21,6 +21,15 @@ then
   echo "You're also prompted for the MySQL Password during install.  The value provided here must be the same."
 exit $E_BADARGS
 fi
+
+#++++++++++++++++++++++++++++
+#Using figlet to banner some installation feedback
+apt-get install figlet -y
+figlet Installing OpenStack -t
+# Could use 'toilet'
+# apt-get install toilet -y
+#toilet -f mono12 -F metal Installing OpenStack
+#++++++++++++++++++++++++++++
 
 KEYSTONE_PUB_IP=$1
 NOVA_PUB_IP=$1
@@ -38,15 +47,6 @@ GLANCE_PRIV_IP=localhost
 TOKEN=012345SECRET99TOKEN012345
 GLANCEPASSWORD=glance
 MYSQLPWORD=$2 
-
-#++++++++++++++++++++++++++++
-#Using figlet to banner some installation feedback
-apt-get install figlet -y
-figlet Installing OpenStack -t
-# Could use 'toilet'
-# apt-get install toilet -y
-#toilet -f mono12 -F metal Installing OpenStack
-#++++++++++++++++++++++++++++
 
 ##Keystone Package Install
 figlet Keystone Package -t
@@ -165,8 +165,9 @@ admin_password = glance
 flavor=keystone
 config_file = /etc/glance/glance-api-paste.ini
 
-enable_v2_api=True
-enable_v1_api=False
+#Think this should be v1
+enable_v1_api=True
+enable_v2_api=False
 EOF
 
 service glance-api restart
