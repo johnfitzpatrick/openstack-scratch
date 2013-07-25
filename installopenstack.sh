@@ -58,8 +58,8 @@ mysql -uroot -p$MYSQLPWORD -s -N -e "CREATE DATABASE keystone"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '$MYSQLPWORD'"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '$MYSQLPWORD'"
 
-figlet Glance Package -t
-sudo apt-get install glance -y
+#figlet Glance Package -t
+#sudo apt-get install glance -y
 
 sed -i -r "s/admin_token = ADMIN/admin_token = $TOKEN/i" /etc/keystone/keystone.conf
 sed -i -r "s/connection = sqlite:\/\/\/\/var\/lib\/keystone\/keystone.db/connection = mysql:\/\/keystone:$MYSQLPWORD@localhost\/keystone/i" /etc/keystone/keystone.conf

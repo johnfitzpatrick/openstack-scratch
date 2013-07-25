@@ -8,7 +8,7 @@
 
 ################################################################
 #NOTES:                                                        #
-#Changed version numbers to v2 for all Cinder urls on line 131 #
+#Changed version numbers to v1 for all Cinder urls on line 131 #
 #                                                              #
 ################################################################
 
@@ -128,7 +128,7 @@ keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-cre
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=cinder --type=volume --description="Cinder Volume Service";sleep 0.5
 SERVICE_ID_CINDER_VOLUME=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='volume'"`;sleep 0.5
 
-keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_CINDER_VOLUME --publicurl=http://$CINDER_PUB_IP:8776/v2/%\(tenant_id\)s --internalurl=http://$CINDER_PRIV_IP:8776/v2/%\(tenant_id\)s --adminurl=http://$CINDER_PUB_IP:8776/v2/%\(tenant_id\)s
+keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_CINDER_VOLUME --publicurl=http://$CINDER_PUB_IP:8776/v1/%\(tenant_id\)s --internalurl=http://$CINDER_PRIV_IP:8776/v1/%\(tenant_id\)s --adminurl=http://$CINDER_PUB_IP:8776/v1/%\(tenant_id\)s
 
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=glance --type=image --description="Glance Image Service";sleep 0.5
 SERVICE_ID_GLANCE_IMAGE=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='image'"`;sleep 0.5
