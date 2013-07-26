@@ -131,6 +131,7 @@ keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-cre
 
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-create --name=glance --type=image --description="Glance Image Service";sleep 0.5
 SERVICE_ID_GLANCE_IMAGE=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='image'"`;sleep 0.5
+#keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_GLANCE_IMAGE --publicurl=http://$GLANCE_PUB_IP:9292 --internalurl=http://$GLANCE_PRIV_IP:9292 --adminurl=http://$GLANCE_PUB_IP:9292
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_GLANCE_IMAGE --publicurl=http://$GLANCE_PUB_IP:9292/v1 --internalurl=http://$GLANCE_PRIV_IP:9292/v1 --adminurl=http://$GLANCE_PUB_IP:9292/v1
 
 #sudo apt-get install python-paste glance glance-client python-mysqldb -y
