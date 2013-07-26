@@ -43,7 +43,6 @@ CINDER_PRIV_IP=localhost
 GLANCE_PRIV_IP=localhost
 
 #PASSWORDS
-#You're prompted for the MySQL Password during install.  The value in this script must be the same.
 TOKEN=012345SECRET99TOKEN012345
 #GLANCEPASSWORD=glance
 GLANCEPASSWORD=admin
@@ -69,9 +68,6 @@ service mysql restart
 mysql -uroot -p$MYSQLPWORD -s -N -e "CREATE DATABASE keystone"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '$MYSQLPWORD'"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '$MYSQLPWORD'"
-
-figlet Glance Package -t
-sudo apt-get install glance -y
 
 sed -i -r "s/admin_token = ADMIN/admin_token = $TOKEN/i" /etc/keystone/keystone.conf
 sed -i -r "s/connection = sqlite:\/\/\/\/var\/lib\/keystone\/keystone.db/connection = mysql:\/\/keystone:$MYSQLPWORD@localhost\/keystone/i" /etc/keystone/keystone.conf
@@ -137,9 +133,11 @@ keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 service-crea
 SERVICE_ID_GLANCE_IMAGE=`mysql -uroot -p$MYSQLPWORD -s -N -e "SELECT id from keystone.service where type='image'"`;sleep 0.5
 keystone --token $TOKEN --endpoint http://$KEYSTONE_HOST:35357/v2.0 endpoint-create --region RegionOne --service=$SERVICE_ID_GLANCE_IMAGE --publicurl=http://$GLANCE_PUB_IP:9292/v1 --internalurl=http://$GLANCE_PRIV_IP:9292/v1 --adminurl=http://$GLANCE_PUB_IP:9292/v1
 
-sudo apt-get install python-paste glance glance-client python-mysqldb -y
+#sudo apt-get install python-paste glance glance-client python-mysqldb -y
 
-figlet Glance Config -t
+figlet Glance Package -t
+#sudo apt-get install python-paste glance glance-client -y
+apt-get install python-paste glance glance-client -y
 #MySQL Config - Glance
 mysql -uroot -p$MYSQLPWORD -s -N -e "CREATE DATABASE glance"
 mysql -uroot -p$MYSQLPWORD -s -N -e "GRANT ALL ON glance.* TO 'glance'@'%' IDENTIFIED BY '$GLANCEPASSWORD'"
